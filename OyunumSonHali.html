@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gölgelerin Yetimhanesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=UnifrakturMaguntia&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root {
+    --blood-red: #8a0303;
+    --bright-red: #ff0000;
+    --panel-bg: rgba(7, 7, 7, 0.98);
+    --bg-deep: #08060c;
+    --bg-panel: #110d1c;
+    --bg-panel-2: #181329;
+    --ink: #f4eae1;
+    --ink-dim: #7a6f9b;
+    --candle: #f0a828;
+    --candle-soft: #ffcc00;
+    --candle-glow: rgba(240, 168, 40, 0.25);
+    --blood: #822020;
+    --blood-bright: #e63946;
+    --night: #1f183a;
+    --night-bright: #6c5ce7;
+    --ghost: #2ed573;
+    --ghost-dim: #1e824c;
+    --border: #2c2245;
+    --font-pixel: 'Press Start 2P', monospace;
+    --font-mono: 'VT323', monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Cinzel', serif;
+    background-color: #010101;
+    overflow-x: hidden;
+    min-height: 100vh;
+    width: 100vw;
+    user-select: none;
+    color: var(--ink);
+}
+
+/* --- ANA MENÜ STİLLERİ --- */
+#mainMenu {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    transition: opacity 1s ease, visibility 1s;
+}
+
+.game-background {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.75)),
+                url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCACHAIwBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=') repeat center center;
+    background-size: cover;
+    filter: brightness(0.8) contrast(1.4) saturate(0.4);
+    z-index: 1;
+}
+
+#lightningFlash {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    pointer-events: none;
+    z-index: 5;
+    mix-blend-mode: color-dodge;
+}
+.flash-active {
+    animation: advancedLightning 0.5s cubic-bezier(0.15, 0.85, 0.3, 1) forwards;
+}
+@keyframes advancedLightning {
+    0% { background: rgba(215, 230, 255, 0.5); filter: brightness(3); }
+    10% { background: transparent; }
+    16% { background: rgba(185, 215, 255, 0.25); filter: brightness(1.8); }
+    100% { background: transparent; }
+}
+
+.fog-effect {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.85));
+    backdrop-filter: blur(1px);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.center-clue-card {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 460px;
+    background: rgba(3, 3, 3, 0.93);
+    border: 1px solid rgba(138, 3, 3, 0.4);
+    padding: 30px;
+    text-align: center;
+    border-radius: 4px;
+    box-shadow: 0 0 55px rgba(0,0,0,1), inset 0 0 20px rgba(0,0,0,0.95);
+    z-index: 3;
+}
+
+.clue-inscription {
+    font-size: 14px;
+    color: rgba(240, 240, 240, 0.35);
+    font-style: italic;
+    letter-spacing: 2px;
+    line-height: 1.8;
+    text-shadow: 1px 1px 3px rgba(0,0,0,1);
+    margin-bottom: 15px;
+}
+
+.clue-symbol {
+    font-size: 20px;
+    color: rgba(138, 3, 3, 0.7);
+    text-shadow: 0 0 8px var(--blood-red);
+}
+
+.inverted-cross {
+    position: absolute;
+    top: 55px;
+    left: calc(50% - 340px);
+    font-size: 36px;
+    color: var(--blood-red);
+    text-shadow: 0 0 10px #000;
+    font-weight: bold;
+    z-index: 4;
+}
+
+.title-container {
+    position: absolute;
+    top: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: 100%;
+    z-index: 4;
+}
+
+.game-title-main {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 74px;
+    color: var(--blood-red);
+    margin: 0;
+    letter-spacing: 2px;
+    text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.95), 0 0 30px rgba(0, 0, 0, 0.9);
+}
+
+.bottom-menu {
+    position: absolute;
+    bottom: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 65px;
+    z-index: 4;
+    background: rgba(2, 2, 2, 0.96);
+    padding: 14px 55px;
+    border-radius: 2px;
+    border: 1px solid rgba(138, 3, 3, 0.3);
+    box-shadow: 0 15px 40px rgba(0,0,0,1);
+}
+
+.menu-btn {
+    background: transparent;
+    border: none;
+    color: #b5b5b5;
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.menu-btn .icon-box {
+    width: 32px;
+    height: 32px;
+    background: rgba(138, 3, 3, 0.15);
+    border: 1px solid rgba(138, 3, 3, 0.45);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blood-red);
+    font-size: 10px;
+    transition: all 0.3s ease;
+}
+
+.menu-btn:hover {
+    color: #ffffff;
+    transform: translateY(-2px);
+    text-shadow: 0 0 8px rgba(255,255,255,0.25);
+}
+
+.menu-btn:hover .icon-box {
+    background: var(--blood-red);
+    color: #ffffff;
+    box-shadow: 0 0 15px var(--blood-red);
+    border-color: var(--bright-red);
+}
+
+.folder-decor {
+    position: absolute;
+    bottom: 55px;
+    right: 14%;
+    transform: rotate(4deg);
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: rgba(220, 220, 220, 0.75);
+    background: rgba(2, 2, 2, 0.9);
+    padding: 6px 14px;
+    border: 1px solid rgba(138, 3, 3, 0.25);
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 4;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.ui-panel {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 430px;
+    background: var(--panel-bg);
+    border: 1px solid rgba(138, 3, 3, 0.45);
+    padding: 35px;
+    box-shadow: 0 0 70px rgba(0,0,0,1);
+    z-index: 110;
+}
+
+.panel-title {
+    font-size: 19px;
+    color: #fff;
+    margin-top: 0;
+    margin-bottom: 22px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding-bottom: 8px;
+}
+
+.ui-row { margin-bottom: 20px; }
+.ui-row label { display: block; font-size: 12px; color: #aaa; margin-bottom: 8px; }
+input[type="range"] { width: 100%; accent-color: var(--blood-red); background: #1a1a1a; }
+
+.close-btn {
+    width: 100%;
+    padding: 11px;
+    background: rgba(138, 3, 3, 0.15);
+    border: 1px solid var(--blood-red);
+    color: #fff;
+    font-family: 'Cinzel', serif;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.close-btn:hover { background: var(--blood-red); }
+
+/* --- OYUN EKRANI & CRT ATMOSFER STİLLERİ --- */
+#gameContent {
+    display: none;
+    position: relative;
+    z-index: 2;
+    max-width: 680px;
+    margin: 40px auto 120px;
+    padding: 30px;
+    background: var(--bg-panel);
+    border: 4px solid var(--border);
+    box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0,0,0,0.6);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+}
+
+body.in-game {
+    background-color: var(--bg-deep);
+    background-image: 
+      radial-gradient(circle at 50% 30%, rgba(31, 24, 58, 0.4), transparent 70%),
+      linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+      linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 100%, 100% 4px, 6px 100%;
+    transition: background-color 1s ease;
+}
+
+body.in-game::after {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    z-index: 999;
+    background-size: 100% 3px, 3px 100%;
+    pointer-events: none;
+}
+
+body.is-night { background-color: #040306 !important; }
+body.is-glitching { animation: screenGlitch 0.15s infinite; }
+
+@keyframes screenGlitch {
+    0%   { filter: hue-rotate(0deg) contrast(1.2); transform: translate(1px, 1px); }
+    30%  { filter: hue-rotate(15deg) brightness(1.2); transform: translate(-1px, -1px); }
+    60%  { filter: hue-rotate(-10deg) brightness(0.8); transform: translate(2px, -1px); }
+    100% { filter: hue-rotate(0deg) contrast(1); transform: translate(0, 0); }
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 4px solid var(--border);
+}
+
+.game-title {
+    font-family: var(--font-pixel);
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    color: var(--candle);
+    text-shadow: 3px 3px 0 #000;
+    line-height: 1.4;
+}
+
+.daycycle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-pixel);
+    font-size: 9px;
+    color: var(--ink-dim);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 12px;
+    border: 2px solid var(--border);
+    border-radius: 2px;
+}
+.daycycle .dot {
+    width: 10px; height: 10px;
+    background: var(--candle);
+    box-shadow: 0 0 10px var(--candle);
+    border-radius: 50%;
+}
+body.is-night .daycycle .dot {
+    background: var(--blood-bright);
+    box-shadow: 0 0 10px var(--blood-bright);
+}
+
+.compass-wrap {
+    position: fixed;
+    top: 40px;
+    right: 40px;
+    width: 70px;
+    height: 70px;
+    z-index: 10;
+    display: none;
+}
+@media (max-width: 900px) { 
+    .compass-wrap { 
+      position: static; 
+      margin: 0 auto 20px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center;
+    } 
+}
+
+.compass {
+    width: 100%; height: 100%;
+    background: #09070f;
+    border: 3px solid var(--border);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    border-radius: 50%;
+    position: relative;
+}
+.compass .needle {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 4px; height: 40%;
+    background: var(--blood-bright);
+    transform-origin: bottom center;
+    transform: translate(-50%, -100%) rotate(0deg);
+    transition: transform 1.2s steps(12);
+}
+.compass .needle::after {
+    content: "";
+    position: absolute;
+    bottom: 100%; left: 50%;
+    width: 4px; height: 60%;
+    background: var(--candle);
+    transform: translateX(-50%);
+}
+.compass.glitching .needle {
+    animation: needleGlitch 0.25s infinite linear;
+}
+@keyframes needleGlitch {
+    0% { transform: translate(-50%, -100%) rotate(0deg); }
+    100% { transform: translate(-50%, -100%) rotate(360deg); }
+}
+.compass-label {
+    margin-top: 8px;
+    text-align: center;
+    font-family: var(--font-pixel);
+    font-size: 8px;
+    color: var(--ink-dim);
+    letter-spacing: 0.1em;
+}
+
+.illust-frame {
+    border: 4px solid var(--border);
+    background: #000;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
+    margin-bottom: 25px;
+    overflow: hidden;
+    position: relative;
+}
+.illust-frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
+    background-size: 100% 4px;
+    z-index: 3;
+    pointer-events: none;
+}
+.illust-frame svg { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+
+.scene-label {
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    color: var(--blood-bright);
+    margin-bottom: 8px;
+    letter-spacing: 0.1em;
+}
+
+.scene-title {
+    font-family: var(--font-pixel);
+    font-size: 20px;
+    line-height: 1.4;
+    margin: 0 0 20px;
+    color: var(--ink);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+}
+
+.scene-text {
+    font-size: 23px;
+    line-height: 1.6;
+    color: #e3d9cf;
+    margin-bottom: 20px;
+    white-space: pre-line;
+}
+.scene-text.fade-in { animation: textFade 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+@keyframes textFade {
+    from { opacity: 0; transform: translateY(8px); filter: blur(2px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.scene-note {
+    font-size: 19px;
+    color: var(--ink-dim);
+    border-left: 4px solid var(--candle);
+    background: rgba(240, 168, 40, 0.03);
+    padding: 12px 16px;
+    margin: 24px 0;
+    border-radius: 0 4px 4px 0;
+}
+
+.choices { margin-top: 30px; display: flex; flex-direction: column; gap: 12px; }
+
+.choice-btn {
+    text-align: left;
+    background: #0f0b1a;
+    border: 3px solid var(--border);
+    color: #cbbccb;
+    padding: 16px 20px;
+    font-family: var(--font-mono);
+    font-size: 21px;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    border-radius: 4px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+}
+.choice-btn::before { content: "⬡"; color: var(--ink-dim); margin-right: 12px; transition: color 0.2s; }
+.choice-btn:hover:not(.locked) {
+    border-color: var(--candle);
+    color: #fff;
+    background: var(--bg-panel-2);
+    box-shadow: 0 0 15px var(--candle-glow);
+    transform: translateY(-2px);
+}
+.choice-btn:hover:not(.locked)::before { content: "⬢"; color: var(--candle-soft); text-shadow: 0 0 5px var(--candle-soft); }
+.choice-btn:active:not(.locked) { transform: translateY(1px); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
+.choice-btn .req { display: block; font-family: var(--font-pixel); font-size: 9px; color: var(--blood-bright); margin-top: 8px; margin-left: 24px; letter-spacing: 0.05em; }
+.choice-btn.locked { opacity: 0.3; cursor: not-allowed; background: #0a0712; }
+
+body.is-night .choice-btn:hover:not(.locked) { border-color: var(--blood-bright); box-shadow: 0 0 15px rgba(230, 57, 70, 0.2); }
+body.is-night .choice-btn:hover:not(.locked)::before { color: var(--blood-bright); }
+
+.inventory-bar { margin-top: 35px; padding-top: 20px; border-top: 4px solid var(--border); }
+.inventory-label { font-family: var(--font-pixel); font-size: 9px; color: var(--ink-dim); margin-bottom: 12px; letter-spacing: 0.1em; }
+.inventory-items { display: flex; flex-wrap: wrap; gap: 10px; }
+.item-chip { font-size: 17px; padding: 6px 14px; border: 2px solid var(--border); color: #a398c7; background: rgba(0, 0, 0, 0.4); border-radius: 3px; }
+.item-chip.new { color: var(--candle-soft); border-color: var(--candle); animation: itemPulse 1s steps(4) 2; }
+
+@keyframes itemPulse {
+    0%, 100% { background: rgba(240, 168, 40, 0.2); }
+    50% { background: rgba(0,0,0,0.4); }
+}
+
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #050408;
+    border: 3px solid var(--candle);
+    color: var(--candle-soft);
+    padding: 12px 24px;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 1000;
+    pointer-events: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.ending-banner { text-align: center; font-family: var(--font-pixel); font-size: 14px; letter-spacing: 0.15em; padding: 10px; margin-bottom: 20px; border-radius: 4px; background: rgba(0,0,0,0.4); }
+.ending-banner.good { color: var(--candle-soft); border: 2px solid var(--candle); }
+.ending-banner.bad { color: var(--blood-bright); border: 2px solid var(--blood); }
+.ending-banner.twist { color: var(--ghost); border: 2px solid var(--ghost-dim); }
+
+.final-quote { text-align: center; font-style: italic; font-size: 24px; color: var(--ink-dim); margin: 40px 0; line-height: 1.6; }
+.restart-btn { display: block; margin: 30px auto 0; background: var(--blood); border: 3px solid transparent; color: #fff; padding: 15px 30px; font-family: var(--font-pixel); font-size: 11px; cursor: pointer; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); transition: all 0.2s; }
+.restart-btn:hover { background: var(--blood-bright); transform: scale(1.05); }
+
+.vignette-flicker { position: fixed; inset: 0; pointer-events: none; z-index: 5; background: radial-gradient(circle at 50% 50%, transparent 30%, rgba(0,0,0,0.85) 100%); opacity: 0; transition: opacity 0.5s; }
+.vignette-flicker.active { opacity: 1; animation: ambientFlicker 4s infinite; }
+@keyframes ambientFlicker { 0%, 100% { opacity: 0.95; } 45% { opacity: 0.88; } 50% { opacity: 1; } 85% { opacity: 0.92; } }
+
+.screen-crack { position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0; }
+.screen-crack.active { opacity: 1; animation: crackFlash 0.3s steps(2) 2; }
+@keyframes crackFlash { 0% { opacity: 0; background: transparent; } 50% { opacity: 1; background: rgba(255, 255, 255, 0.8); } 100% { opacity: 1; } }
+
+.blackout { position: fixed; inset: 0; background: #000; z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 2s ease; }
+.blackout.active { opacity: 1; }
+
+.progress-track { display: flex; gap: 6px; margin-bottom: 25px; }
+.progress-track .seg { flex: 1; height: 6px; background: var(--border); border-radius: 2px; }
+.progress-track .seg.done { background: var(--candle); box-shadow: 0 0 6px var(--candle-glow); }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<!-- ANA MENÜ UI KATMANI -->
+<div id="mainMenu">
+    <div class="game-background"></div>
+    <div id="lightningFlash"></div>
+    <div class="fog-effect"></div>
+    <span class="inverted-cross">⸸</span>
+    <div class="title-container">
+        <h1 class="game-title-main">Gölgelerin Yetimhanesi</h1>
+    </div>
+    <div class="center-clue-card">
+        <div class="clue-inscription">
+            "Kapının üzerindeki resmi bul.<br>Harita seni gerçeğe götürecek."
+        </div>
+        <div class="clue-symbol">⸸</div>
+    </div>
+    <div class="bottom-menu">
+        <button class="menu-btn" onclick="startNewGame()">
+            <div class="icon-box">▶</div>
+            <span>Yeni Oyun</span>
+        </button>
+        <button class="menu-btn" onclick="loadSavedGame()">
+            <div class="icon-box">▶</div>
+            <span>Devam Et</span>
+        </button>
+        <button class="menu-btn" onclick="openPanel('settingsPanel')">
+            <div class="icon-box">⚙</div>
+            <span>Ayarlar</span>
+        </button>
+        <button class="menu-btn" onclick="openPanel('creditsPanel')">
+            <div class="icon-box">🪪</div>
+            <span>Credits</span>
+        </button>
+    </div>
+    <div class="folder-decor">DOSYALAR</div>
+</div>
+
+<!-- AYARLAR & CREDITS PANELLERİ -->
+<div class="ui-panel" id="settingsPanel">
+    <h2 class="panel-title">SES & PARAZİT AYARLARI</h2>
+    <div class="ui-row">
+        <label>Radyo Paraziti & Fısıltılar</label>
+        <input type="range" min="0" max="100" value="75">
+    </div>
+    <div class="ui-row">
+        <label>Fırtına Yoğunluğu</label>
+        <input type="range" min="0" max="100" value="95">
+    </div>
+    <button class="close-btn" onclick="closePanels()">KAPAT</button>
+</div>
+
+<div class="ui-panel" id="creditsPanel">
+    <h2 class="panel-title">YETİMHANE PROJE ARŞİVİ</h2>
+    <p style="font-size:13px; color:#ccc; margin: 0 0 10px 0;"><strong>Yazar & Senarist:</strong> Burak Eti</p>
+    <p style="font-size:13px; color:#ccc; margin: 0 0 20px 0;"><strong>Geliştirici:</strong> ByScremente</p>
+    <button class="close-btn" onclick="closePanels()">KAPAT</button>
+</div>
+
+<!-- OYUN UI KATMANLARI -->
+<div class="vignette-flicker" id="vignette"></div>
+<div class="screen-crack" id="screenCrack"></div>
+<div class="blackout" id="blackout"></div>
+
+<div class="compass-wrap" id="gameCompassHUD">
+  <div class="compass" id="compass">
+    <div class="needle" id="compassNeedle"></div>
+  </div>
+  <div class="compass-label" id="compassLabel">KUZEY</div>
+</div>
+
+<div id="gameContent">
+  <div class="topbar">
+    <div class="game-title">GÖLGELERİN<br>YETİMHANESİ</div>
+    <div class="daycycle"><span class="dot"></span><span id="dayLabel">GÜNDÜZ</span></div>
+  </div>
+  <div class="progress-track" id="progressTrack"></div>
+  <div id="sceneRoot"></div>
+  <div class="inventory-bar">
+    <div class="inventory-label">ÇANTA H.U.D.</div>
+    <div class="inventory-items" id="inventoryItems"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// --- STEAM & DURUM ENTEGRASYON KÖPRÜSÜ ---
+const SteamBridge = {
+    saveGame(stateData) {
+        localStorage.setItem("golgelerin_yetimhanesi_save", JSON.stringify(stateData));
+        console.log("Steam Cloud: Oyun durumu yerel belleğe yedeklendi.");
+    },
+    loadGame() {
+        const data = localStorage.getItem("golgelerin_yetimhanesi_save");
+        return data ? JSON.parse(data) : null;
+    },
+    unlockAchievement(name) {
+        console.log(`Steam API: Başarım Açıldı -> [${name}]`);
+    }
+};
+
+// --- ANA MENÜ KONTROLLERİ ---
+function openPanel(id) {
+    closePanels();
+    document.getElementById(id).style.display = 'block';
+}
+function closePanels() {
+    document.querySelectorAll('.ui-panel').forEach(p => p.style.display = 'none');
+}
+
+function startNewGame() {
+    document.getElementById('mainMenu').style.opacity = '0';
+    setTimeout(() => {
+        document.getElementById('mainMenu').style.visibility = 'hidden';
+        document.body.classList.add('in-game');
+        document.getElementById('gameCompassHUD').style.display = 'block';
+        document.getElementById('gameContent').style.display = 'block';
+        GameEngine.init();
+    }, 1000);
+}
+
+function loadSavedGame() {
+    const saved = SteamBridge.loadGame();
+    if (saved) {
+        document.getElementById('mainMenu').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('mainMenu').style.visibility = 'hidden';
+            document.body.classList.add('in-game');
+            document.getElementById('gameCompassHUD').style.display = 'block';
+            document.getElementById('gameContent').style.display = 'block';
+            GameEngine.loadFromState(saved);
+        }, 1000);
+    } else {
+        alert('Kayıtlı arşiv odası bulunamadı! Yeni Hikaye başlatılıyor...');
+        startNewGame();
+    }
+}
+
+// Yıldırım Efekti Mekaniği
+function triggerLightning() {
+    const flashLayer = document.getElementById('lightningFlash');
+    if(flashLayer) {
+        flashLayer.classList.add('flash-active');
+        setTimeout(() => { flashLayer.classList.remove('flash-active'); }, 450);
+        setTimeout(triggerLightning, Math.random() * 6000 + 4000);
+    }
+}
+setTimeout(triggerLightning, 2000);
+
+
+// --- OYUN MOTORU (MANTIKSAL AKIŞ) ---
+const GameEngine = (function(){
+  const ART = {
+    yetimhane: `<svg viewBox="0 0 160 90" xmlns="http://www.w3.org/2000/svg"><rect width="160" height="90" fill="#1a1430"/><rect x="0" y="0" width="160" height="55" fill="#241c3d"/><rect x="0" y="55" width="160" height="35" fill="#100c1d"/><rect x="128" y="10" width="14" height="14" fill="#e8e2c0"/><rect x="124" y="14" width="4" height="6" fill="#e8e2c0"/><rect x="142" y="14" width="4" height="6" fill="#e8e2c0"/><rect x="30" y="34" width="100" height="46" fill="#3a3050"/><rect x="30" y="34" width="100" height="6" fill="#4a3e64"/><rect x="22" y="26" width="116" height="8" fill="#241c3d"/><rect x="34" y="18" width="92" height="8" fill="#241c3d"/><rect x="46" y="10" width="68" height="8" fill="#241c3d"/><rect x="44" y="44" width="12" height="14" fill="#0c0a14" stroke="#1a1430" stroke-width="2"/><rect x="48" y="48" width="3" height="6" fill="#e8b339" opacity="0.8"/><rect x="74" y="44" width="12" height="14" fill="#0c0a14"/><rect x="104" y="44" width="12" height="14" fill="#0c0a14"/><rect x="70" y="56" width="20" height="24" fill="#0c0a14" stroke="#1a1430" stroke-width="2"/><rect x="74" y="50" width="12" height="9" fill="#5a4a30"/><rect x="76" y="52" width="8" height="5" fill="#2a2418"/><rect x="75" y="46" width="4" height="10" fill="#0c0a14"/><rect x="76" y="47" width="2" height="3" fill="#4ecca3" opacity="0.5"/><rect x="0" y="80" width="160" height="10" fill="#0a0814"/></svg>`,
+    mezarlik: `<svg viewBox="0 0 160 90" xmlns="http://www.w3.org/2000/svg"><rect width="160" height="90" fill="#0f0c1f"/><rect x="0" y="0" width="160" height="60" fill="#181430"/><rect x="20" y="10" width="10" height="10" fill="#e8e2c0" opacity="0.85"/><rect x="0" y="60" width="160" height="30" fill="#0a0814"/><rect x="0" y="52" width="160" height="6" fill="#5444a0" opacity="0.18"/><rect x="20" y="48" width="14" height="20" fill="#2a2444"/><rect x="23" y="44" width="8" height="6" fill="#2a2444"/><rect x="60" y="52" width="14" height="16" fill="#332c52"/><rect x="63" y="48" width="8" height="6" fill="#332c52"/><rect x="100" y="50" width="14" height="18" fill="#2a2444"/><rect x="103" y="46" width="8" height="6" fill="#2a2444"/><rect x="130" y="54" width="12" height="14" fill="#241f3d"/><rect x="42" y="56" width="12" height="14" fill="#3a3258"/><rect x="44" y="52" width="8" height="6" fill="#3a3258"/><rect x="46" y="60" width="4" height="3" fill="#e8b339" opacity="0.7"/><rect x="4" y="30" width="10" height="28" fill="#0a0814"/><rect x="146" y="26" width="10" height="32" fill="#0a0814"/></svg>`,
+    mahzen: `<svg viewBox="0 0 160 90" xmlns="http://www.w3.org/2000/svg"><rect width="160" height="90" fill="#0a0810"/><rect x="0" y="0" width="160" height="90" fill="#1d1626"/><rect x="72" y="8" width="4" height="26" fill="#a13030"/><rect x="62" y="24" width="24" height="4" fill="#a13030"/><rect x="20" y="58" width="4" height="10" fill="#e8e2c0"/><rect x="21" y="52" width="2" height="6" fill="#e8b339"/><rect x="34" y="60" width="4" height="8" fill="#e8e2c0"/><rect x="35" y="54" width="2" height="6" fill="#e8b339"/><rect x="122" y="58" width="4" height="10" fill="#e8e2c0"/><rect x="123" y="52" width="2" height="6" fill="#e8b339"/><rect x="136" y="60" width="4" height="8" fill="#e8e2c0"/><rect x="137" y="54" width="2" height="6" fill="#e8b339"/><circle cx="22" cy="50" r="14" fill="#e8b339" opacity="0.08"/><circle cx="124" cy="50" r="14" fill="#e8b339" opacity="0.08"/><rect x="74" y="44" width="12" height="30" fill="#000"/><rect x="76" y="38" width="8" height="8" fill="#000"/><rect x="70" y="60" width="20" height="14" fill="#000"/><rect x="0" y="78" width="160" height="12" fill="#050408"/><rect x="0" y="76" width="160" height="2" fill="#3a3258" opacity="0.5"/></svg>`,
+    vapur_final: `<svg viewBox="0 0 160 90" xmlns="http://www.w3.org/2000/svg"><rect width="160" height="90" fill="#0a0814"/><rect x="0" y="0" width="160" height="58" fill="#100c20"/><rect x="0" y="58" width="160" height="32" fill="#06070d"/><rect x="0" y="58" width="160" height="33" fill="#1a1f33"/><rect x="20" y="10" width="12" height="12" fill="#d8d2b8" opacity="0.7"/><rect x="60" y="48" width="50" height="14" fill="#1f1c30"/><rect x="68" y="38" width="10" height="12" fill="#1f1c30"/><rect x="70" y="40" width="3" height="4" fill="#e8b339" opacity="0.7"/><rect x="90" y="40" width="3" height="4" fill="#e8b339" opacity="0.7"/><rect x="100" y="32" width="4" height="18" fill="#15121f"/><rect x="76" y="40" width="10" height="8" fill="#0c0a14"/><rect x="78" y="41" width="6" height="6" fill="#4ecca3" opacity="0.55"/><rect x="79" y="43" width="1.5" height="1.5" fill="#0a0a0a"/><rect x="83" y="43" width="1.5" height="1.5" fill="#0a0a0a"/><rect x="0" y="60" width="36" height="6" fill="#1a1626"/><rect x="4" y="66" width="4" height="14" fill="#100c1d"/><rect x="26" y="66" width="4" height="14" fill="#100c1d"/><rect x="14" y="56" width="6" height="5" fill="#050308"/><rect x="13" y="53" width="2" height="3" fill="#050308"/><rect x="19" y="53" width="2" height="3" fill="#050308"/><rect x="14" y="61" width="2" height="3" fill="#050308"/><rect x="17" y="61" width="2" height="3" fill="#050308"/><rect x="13" y="57" width="1" height="1" fill="#4ecca3"/><rect x="60" y="62" width="50" height="3" fill="#1f1c30" opacity="0.3"/></svg>`
+  };
+
+  let state = {
+    sceneId: 'intro_1',
+    inventory: ['mum', 'çakmak', 'pusula', 'yardım fişeği'],
+    flags: {
+      haritaBulundu: false,
+      gunlukOkundu: false,
+      belgelerBulundu: false,
+      anahtarBulundu: false,
+      cocugunAkibetiOgrenildi: false,
+      mahzenGorundu: false,
+      hubVisits: 0,
+      isNight: false,
+    },
+    newItemFlash: null,
+  };
+
+  const ITEM_LABELS = {
+    'mum': 'Mum', 'çakmak': 'Çakmak', 'pusula': 'Pusula', 'yardım fişeği': 'Yardım Fişeği',
+    'gizli harita': 'Gizli Harita', 'eski günlük': 'Eski Günlük', 'çocuk dosyaları': 'Çocuk Dosyaları',
+    'ayin odası anahtarı': 'Ayin Odası Anahtarı', 'gizli belgeler': 'Gizli Belgelerr'
+  };
+
+  const COMPASS_DIRECTIONS = {
+    intro_1: { angle: 0, label: 'KUZEY' },
+    intro_2: { angle: 45, label: 'KUZEYDOĞU' },
+    yetimhane_1: { angle: 90, label: 'DOĞU' },
+    yetimhane_kapi: { angle: 180, label: 'GÜNEY' },
+    harita_bulundu: { angle: 270, label: 'BATI' },
+    ada_hub: { angle: 0, label: 'MERKEZ' },
+    mezarlik: { angle: 315, label: 'KUZEYBATI' },
+    mahzen: { angle: 135, label: 'GÜNEYDOĞU' },
+    final_good: { angle: 90, label: 'DOĞU' },
+    final_bad: { angle: 180, label: 'KAYIP' }
+  };
+
+  function addItem(item){
+    if(!state.inventory.includes(item)){
+      state.inventory.push(item);
+      state.newItemFlash = item;
+      showToast('+ ' + (ITEM_LABELS[item] || item));
+    }
+  }
+
+  function hasItem(item){ return state.inventory.includes(item); }
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    if(t) {
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(()=> t.classList.remove('show'), 2400);
+    }
+  }
+
+  const SCENES = {
+    intro_1: {
+      label: 'ÖNSÖZ', title: 'İsimsiz Mektup', progress: 1, forceDay: true,
+      text: `Gazetecilik kariyerinin en sessiz dönemindesin. Editörün sana "ilginç ama önemsiz" diye iade ettiği haberlerin arasında, bir sabah kapının altından isimsiz bir zarf çıkar.\n\nEl yazısı titrek, mürekkep eski:\n\n"Kapının üzerindeki resmi bul. Harita seni gerçeğe götürecek."\n\nAdres yok. İmza yok. Sadece ıssız bir adanın koordinatları ve yıllar önce kapatılmış bir yetimhanenin adı: Aziz Lazarus Yetimhanesi.`,
+      note: 'Bu hikaye seninle birlikte ilerleyecek. Her seçim bir kapı açar — bazıları seni gerçeğe, bazıları karanlığa götürür.',
+      choices: [{ text: 'Çantanı hazırla ve vapura bin.', next: 'intro_2' }]
+    },
+    intro_2: {
+      label: 'YOLCULUK', title: 'Issız Adaya Doğru', progress: 1,
+      text: `Vapur seni adanın taş rıhtımına bırakır ve hemen geri döner — kaptan gece kalmayacağını söylemişti zaten, sormaya bile gerek kalmadı.\n\nÇantanda gerekli olabilecek her şey var: bir mum, bir çakmak, eski bir pusula, bir yardım fişeği. Önünde, ağaçların arasından zar zor görünen taş bir bina yükseliyor: Aziz Lazarus Yetimhanesi.\n\nRüzgar tuhaf bir şekilde sessiz. Sanki ada, nefesini tutuyor.`,
+      choices: [{ text: 'Yetimhaneye doğru yürü.', next: 'yetimhane_1' }]
+    },
+    yetimhane_1: {
+      label: 'YETİMHANE', title: 'Çatlak Duvarlar', progress: 2, art: 'yetimhane',
+      text: `Yetimhane harabe halinde — çatı kısmen çökmüş, pencereler kırık. Ama içeriden, olmaması gereken bir ses geliyor: alçak, ritmik bir mırıltı. Şarkı mı, dua mı, anlayamıyorsun.\n\nKırık bir pencereden içeri göz attığın anda, camın ardında bir anlığına bir siluet belirir — uzun, hareketsiz, sonra yok olur. Kalbin hızlanır.`,
+      choices: [
+        { text: 'İçeriye doğru ilerle, sesi takip et.', next: 'mahzen' },
+        { text: 'Önce dışarıdan binayı incele.', next: 'yetimhane_kapi' }
+      ]
+    },
+    yetimhane_kapi: {
+      label: 'YETİMHANE', title: 'Kapının Üzerindeki Resim', progress: 2,
+      text: `Mektubu hatırlıyorsun: "Kapının üzerindeki resmi bul." Ana girişin üstünde, çatlamış bir çerçeve içinde solgun bir tablo asılı — yetimhanenin kurucusu olduğu yazılan bir rahip.\n\nTabloyu dikkatle çerçevesinden çıkarıyorsun. Arkasında, kurumuş tutkalla yapıştırılmış eski bir kağıt var: el çizimi bir harita.`,
+      choices: [{ text: 'Haritayı al ve incele.', next: 'harita_bulundu' }]
+    },
+    harita_bulundu: {
+      label: 'KEŞİF', title: 'Gizli Harita', progress: 2,
+      text: `Harita kabaca çizilmiş ama net: adanın kritik noktaları işaretli.\n\n— Eski mezarlık\n— Kapalı mahzenler\n\nElin titriyor. Bu bir çocuk oyunu değil — biri, yıllar önce, birilerinin bunu bulmasını istemiş.`,
+      onEnter: (s) => {
+         state.flags.haritaBulundu = true;
+         addItem('gizli harita');
+      },
+      choices: [{ text: 'Haritayı çantaya at ve adayı keşfet.', next: 'ada_hub' }]
+    },
+    ada_hub: {
+      label: 'KEŞİF', title: 'Ada Patikaları', progress: 3,
+      text: `Zaman hızla ilerliyor. Rüzgar sertleşti ve hava kararmaya başladı. Haritana göre adada gidebileceğin iki ana bölge var. Ne yapmak istersen hızlı olmalısın.`,
+      onEnter: (s) => {
+         state.flags.hubVisits++;
+         if(state.flags.hubVisits >= 2) {
+             state.flags.isNight = true;
+         }
+      },
+      choices: [
+        { text: 'Eski Mezarlık patikasına sap.', next: 'mezarlik' },
+        { text: 'Yetimhanenin altındaki Mahzen Kapısına git.', next: 'mahzen' }
+      ]
+    },
+    mezarlik: {
+      label: 'MEZARLIK', title: 'Suskun Taşlar', progress: 4, art: 'mezarlik',
+      text: `Yosun tutmuş mezar taşları arasında yürüyorsun. Dikkatini çeken büyük bir aile mezarlığının üzerinde bir demir anahtar ve eski bir defter duruyor. Birileri sanki onları buraya senin için bırakmış gibi.`,
+      onEnter: (s) => {
+          state.flags.gunlukOkundu = true;
+          state.flags.anahtarBulundu = true;
+          addItem('eski günlük');
+          addItem('ayin odası anahtarı');
+      },
+      choices: [{ text: 'Bulduklarını alıp Merkez Patikaya dön.', next: 'ada_hub' }]
+    },
+    mahzen: {
+      label: 'MAHZEN', title: 'Karanlık Merdivenler', progress: 4, art: 'mahzen',
+      text: `Ağır demir kapı kapalı. Kapının üzerinde devasa bir antik kilit mekanizması var. Sadece doğru anahtara sahip olanlar buraya girebilir.`,
+      onEnter: (s) => {
+          state.flags.mahzenGorundu = true;
+      },
+      dynamicChoices: () => {
+          let list = [];
+          if(hasItem('ayin odası anahtarı')) {
+              list.push({ text: 'Ayin Odası Anahtarını kullanarak kapıyı aç.', next: 'final_good' });
+          } else {
+              list.push({ text: 'Kapı kilitli. İncelemek için başka bir yol ara.', next: 'ada_hub' });
+          }
+          list.push({ text: 'Zorlamayı bırak ve risk alarak yardım fişeğini ateşle.', next: 'final_bad' });
+          return list;
+      }
+    },
+    final_good: {
+      label: 'SON', title: 'Kayıp Gerçekler', progress: 5, art: 'vapur_final',
+      isEnding: true, endingType: 'good',
+      text: `Anahtar kilide tam oturuyor. İçerideki gizli dosyalarda çocukların aslında nereye gönderildiği yazıyor: Her şey kurgulanmış bir kaçış operasyonuydu! Sahile ulaşıp adadan uzaklaşan ilk vapura biniyorsun. Gerçek artık elinde.`,
+      quote: '"Işık, en derin karanlığın içinden doğar."'
+    },
+    final_bad: {
+      label: 'SON', title: 'Gölgede Kalanlar', progress: 5,
+      isEnding: true, endingType: 'bad',
+      text: `Yardım fişeği gökyüzünü kırmızıya boyuyor ama adanın derinliklerinden gelen o ritmik mırıltı birden çığlıklara dönüşüyor. Arkana baktığında gölgelerin etrafını sardığını görüyorsun. Sesler yaklaşırken her şey kararıyor...`,
+      quote: '"Karanlık, sabırsız olanları ilk yutandır."'
+    }
+  };
+
+  function renderScene() {
+    const scene = SCENES[state.sceneId];
+    if(!scene) return;
+
+    // Enter Hook Tetikleme
+    if(scene.onEnter) scene.onEnter(scene);
+
+    // Gece/Gündüz Döngüsü Kontrolü
+    const body = document.body;
+    const dayLabel = document.getElementById('dayLabel');
+    if(scene.forceDay) {
+        state.flags.isNight = false;
+    }
+    if(state.flags.isNight) {
+        body.classList.add('is-night');
+        if(dayLabel) dayLabel.textContent = "GECE";
+    } else {
+        body.classList.remove('is-night');
+        if(dayLabel) dayLabel.textContent = "GÜNDÜZ";
+    }
+
+    // HUD - Pusula Güncelleme
+    const compass = document.getElementById('compass');
+    const needle = document.getElementById('compassNeedle');
+    const compLabel = document.getElementById('compassLabel');
+    const compHUD = document.getElementById('gameCompassHUD');
+
+    if(COMPASS_DIRECTIONS[state.sceneId]) {
+        const cData = COMPASS_DIRECTIONS[state.sceneId];
+        if(needle) needle.style.transform = `translate(-50%, -100%) rotate(${cData.angle}deg)`;
+        if(compLabel) compLabel.textContent = cData.label;
+        if(state.flags.isNight && compass) {
+            compass.classList.add('glitching');
+            body.classList.add('is-glitching');
+        } else if(compass) {
+            compass.classList.remove('glitching');
+            body.classList.remove('is-glitching');
+        }
+    }
+
+    // Progress Track Oluşturma
+    const progTrack = document.getElementById('progressTrack');
+    if(progTrack) {
+        progTrack.innerHTML = '';
+        for(let i=1; i<=5; i++) {
+            let seg = document.createElement('div');
+            seg.className = 'seg' + (i <= scene.progress ? ' done' : '');
+            progTrack.appendChild(seg);
+        }
+    }
+
+    // HTML İçerik İnşası
+    let html = '';
+    
+    if(scene.art && ART[scene.art]) {
+        html += `<div class="illust-frame">${ART[scene.art]}</div>`;
+    }
+
+    html += `<div class="scene-label">${scene.label}</div>`;
+    html += `<h2 class="scene-title">${scene.title}</h2>`;
+    html += `<div class="scene-text fade-in">${scene.text}</div>`;
+
+    if(scene.note) {
+        html += `<div class="scene-note">${scene.note}</div>`;
+    }
+
+    // Son Ekran Değerlendirmesi
+    if(scene.isEnding) {
+        let bannerClass = scene.endingType === 'good' ? 'good' : 'bad';
+        let bannerText = scene.endingType === 'good' ? 'BAŞARILI BAŞARIM: GERÇEĞE ULAŞILDI' : 'KÖTÜ SON: ADADA KAYBOLDUN';
+        
+        html += `<div class="ending-banner ${bannerClass}">${bannerText}</div>`;
+        if(scene.quote) html += `<div class="final-quote">${scene.quote}</div>`;
+        html += `<button class="restart-btn" onclick="GameEngine.restart()">HİKAYEYE YENİDEN BAŞLA</button>`;
+        
+        SteamBridge.unlockAchievement(scene.title);
+    } else {
+        // Seçenekleri Listeleme
+        html += `<div class="choices">`;
+        let choicesList = scene.dynamicChoices ? scene.dynamicChoices() : scene.choices;
+        
+        if(choicesList) {
+            choicesList.forEach((c, idx) => {
+                html += `<button class="choice-btn" onclick="GameEngine.makeChoice(${idx})">${c.text}</button>`;
+            });
+        }
+        html += `</div>`;
+    }
+
+    document.getElementById('sceneRoot').innerHTML = html;
+    renderInventory();
+    
+    // Otomatik Kaydet
+    SteamBridge.saveGame(state);
+  }
+
+  function renderInventory() {
+    const container = document.getElementById('inventoryItems');
+    if(!container) return;
+    container.innerHTML = '';
+    state.inventory.forEach(item => {
+        let chip = document.createElement('div');
+        chip.className = 'item-chip' + (state.newItemFlash === item ? ' new' : '');
+        chip.textContent = ITEM_LABELS[item] || item;
+        container.appendChild(chip);
+    });
+    state.newItemFlash = null;
+  }
+
+  return {
+    init: function() {
+        state.sceneId = 'intro_1';
+        state.inventory = ['mum', 'çakmak', 'pusula', 'yardım fişeği'];
+        state.flags = { haritaBulundu: false, gunlukOkundu: false, belgelerBulundu: false, anahtarBulundu: false, cocugunAkibetiOgrenildi: false, mahzenGorundu: false, hubVisits: 0, isNight: false };
+        renderScene();
+        const vig = document.getElementById('vignette');
+        if(vig) vig.classList.add('active');
+    },
+    makeChoice: function(index) {
+        const scene = SCENES[state.sceneId];
+        let choicesList = scene.dynamicChoices ? scene.dynamicChoices() : scene.choices;
+        if(choicesList && choicesList[index]) {
+            state.sceneId = choicesList[index].next;
+            renderScene();
+        }
+    },
+    loadFromState: function(savedState) {
+        state = savedState;
+        renderScene();
+        const vig = document.getElementById('vignette');
+        if(vig) vig.classList.add('active');
+    },
+    restart: function() {
+        const bo = document.getElementById('blackout');
+        if(bo) {
+            bo.classList.add('active');
+            setTimeout(() => {
+                bo.classList.remove('active');
+                document.body.classList.remove('in-game');
+                document.getElementById('gameCompassHUD').style.display = 'none';
+                document.getElementById('gameContent').style.display = 'none';
+                document.getElementById('mainMenu').style.visibility = 'visible';
+                document.getElementById('mainMenu').style.opacity = '1';
+            }, 1500);
+        }
+    }
+  };
+})();
+</script>
+</body>
+</html>
