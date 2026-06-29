@@ -654,12 +654,21 @@ body.is-night .choice-btn:hover:not(.locked)::before { color: var(--blood-bright
 // --- STEAM & DURUM ENTEGRASYON KÖPRÜSÜ ---
 const SteamBridge = {
     saveGame(stateData) {
-        localStorage.setItem("golgelerin_yetimhanesi_save", JSON.stringify(stateData));
-        console.log("Steam Cloud: Oyun durumu yerel belleğe yedeklendi.");
+        try {
+            localStorage.setItem("golgelerin_yetimhanesi_save", JSON.stringify(stateData));
+            console.log("Steam Cloud: Oyun durumu yerel belleğe yedeklendi.");
+        } catch (err) {
+            console.error("Oyun durumu kaydedilemedi:", err);
+        }
     },
     loadGame() {
-        const data = localStorage.getItem("golgelerin_yetimhanesi_save");
-        return data ? JSON.parse(data) : null;
+        try {
+            const data = localStorage.getItem("golgelerin_yetimhanesi_save");
+            return data ? JSON.parse(data) : null;
+        } catch (err) {
+            console.error("Kayıtlı oyun verisi okunamadı:", err);
+            return null;
+        }
     },
     unlockAchievement(name) {
         console.log(`Steam API: Başarım Açıldı -> [${name}]`);
@@ -669,19 +678,31 @@ const SteamBridge = {
 // --- ANA MENÜ KONTROLLERİ ---
 function openPanel(id) {
     closePanels();
-    document.getElementById(id).style.display = 'block';
+    const panel = document.getElementById(id);
+    if (panel) {
+        panel.style.display = 'block';
+    } else {
+        console.warn(`Panel bulunamadı: "${id}"`);
+    }
 }
 function closePanels() {
     document.querySelectorAll('.ui-panel').forEach(p => p.style.display = 'none');
 }
 
 function startNewGame() {
-    document.getElementById('mainMenu').style.opacity = '0';
+    const mainMenu = document.getElementById('mainMenu');
+    if (!mainMenu) {
+        console.error("Ana menü elementi bulunamadı.");
+        return;
+    }
+    mainMenu.style.opacity = '0';
     setTimeout(() => {
-        document.getElementById('mainMenu').style.visibility = 'hidden';
+        mainMenu.style.visibility = 'hidden';
         document.body.classList.add('in-game');
-        document.getElementById('gameCompassHUD').style.display = 'block';
-        document.getElementById('gameContent').style.display = 'block';
+        const compass = document.getElementById('gameCompassHUD');
+        if (compass) compass.style.display = 'block';
+        const content = document.getElementById('gameContent');
+        if (content) content.style.display = 'block';
         GameEngine.init();
     }, 1000);
 }
@@ -689,12 +710,25 @@ function startNewGame() {
 function loadSavedGame() {
     const saved = SteamBridge.loadGame();
     if (saved) {
-        document.getElementById('mainMenu').style.opacity = '0';
+        if (!saved.sceneId || !saved.inventory || !saved.flags) {
+            console.error("Kayıt verisi bozuk, gerekli alanlar eksik.");
+            alert('Kayıt verisi bozuk! Yeni Hikaye başlatılıyor...');
+            startNewGame();
+            return;
+        }
+        const mainMenu = document.getElementById('mainMenu');
+        if (!mainMenu) {
+            console.error("Ana menü elementi bulunamadı.");
+            return;
+        }
+        mainMenu.style.opacity = '0';
         setTimeout(() => {
-            document.getElementById('mainMenu').style.visibility = 'hidden';
+            mainMenu.style.visibility = 'hidden';
             document.body.classList.add('in-game');
-            document.getElementById('gameCompassHUD').style.display = 'block';
-            document.getElementById('gameContent').style.display = 'block';
+            const compass = document.getElementById('gameCompassHUD');
+            if (compass) compass.style.display = 'block';
+            const content = document.getElementById('gameContent');
+            if (content) content.style.display = 'block';
             GameEngine.loadFromState(saved);
         }, 1000);
     } else {
@@ -870,7 +904,11 @@ const GameEngine = (function(){
 
   function renderScene() {
     const scene = SCENES[state.sceneId];
-    if(!scene) return;
+    if(!scene) {
+      console.error(`Bilinmeyen sahne: "${state.sceneId}". Oyun ilerleyemiyor.`);
+      showToast('Hata: Sahne bulunamadı!');
+      return;
+    }
 
     // Enter Hook Tetikleme
     if(scene.onEnter) scene.onEnter(scene);
@@ -988,13 +1026,28 @@ const GameEngine = (function(){
     },
     makeChoice: function(index) {
         const scene = SCENES[state.sceneId];
-        let choicesList = scene.dynamicChoices ? scene.dynamicChoices() : scene.choices;
-        if(choicesList && choicesList[index]) {
-            state.sceneId = choicesList[index].next;
-            renderScene();
+        if(!scene) {
+            console.error(`Geçersiz sahne: "${state.sceneId}". Seçim yapılamıyor.`);
+            return;
         }
+        let choicesList = scene.dynamicChoices ? scene.dynamicChoices() : scene.choices;
+        if(!choicesList || !choicesList[index]) {
+            console.warn(`Geçersiz seçim indeksi: ${index} (sahne: ${state.sceneId})`);
+            return;
+        }
+        if(!choicesList[index].next) {
+            console.error(`Seçimde hedef sahne tanımlı değil (sahne: ${state.sceneId}, seçim: ${index}).`);
+            return;
+        }
+        state.sceneId = choicesList[index].next;
+        renderScene();
     },
     loadFromState: function(savedState) {
+        if(!savedState || !savedState.sceneId || !savedState.inventory || !savedState.flags) {
+            console.error("Kayıt verisi bozuk veya eksik, varsayılan durumla başlatılıyor.");
+            this.init();
+            return;
+        }
         state = savedState;
         renderScene();
         const vig = document.getElementById('vignette');
@@ -1007,11 +1060,18 @@ const GameEngine = (function(){
             setTimeout(() => {
                 bo.classList.remove('active');
                 document.body.classList.remove('in-game');
-                document.getElementById('gameCompassHUD').style.display = 'none';
-                document.getElementById('gameContent').style.display = 'none';
-                document.getElementById('mainMenu').style.visibility = 'visible';
-                document.getElementById('mainMenu').style.opacity = '1';
+                const compass = document.getElementById('gameCompassHUD');
+                if (compass) compass.style.display = 'none';
+                const content = document.getElementById('gameContent');
+                if (content) content.style.display = 'none';
+                const mainMenu = document.getElementById('mainMenu');
+                if (mainMenu) {
+                    mainMenu.style.visibility = 'visible';
+                    mainMenu.style.opacity = '1';
+                }
             }, 1500);
+        } else {
+            console.error("Blackout elementi bulunamadı, yeniden başlatma yapılamıyor.");
         }
     }
   };

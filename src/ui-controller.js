@@ -1,12 +1,21 @@
 // --- STEAM & DURUM ENTEGRASYON KÖPRÜSÜ ---
 export const SteamBridge = {
     saveGame(stateData) {
-        localStorage.setItem("golgelerin_yetimhanesi_save", JSON.stringify(stateData));
-        console.log("💾 Oyun durumu yerel belleğe yedeklendi.");
+        try {
+            localStorage.setItem("golgelerin_yetimhanesi_save", JSON.stringify(stateData));
+            console.log("💾 Oyun durumu yerel belleğe yedeklendi.");
+        } catch (err) {
+            console.error("Oyun durumu kaydedilemedi:", err);
+        }
     },
     loadGame() {
-        const data = localStorage.getItem("golgelerin_yetimhanesi_save");
-        return data ? JSON.parse(data) : null;
+        try {
+            const data = localStorage.getItem("golgelerin_yetimhanesi_save");
+            return data ? JSON.parse(data) : null;
+        } catch (err) {
+            console.error("Kayıtlı oyun verisi okunamadı:", err);
+            return null;
+        }
     },
     unlockAchievement(name) {
         console.log(`🏆 Başarım Açıldı -> [${name}]`);
@@ -17,7 +26,11 @@ export const SteamBridge = {
 export function openPanel(id) {
     closePanels();
     const panel = document.getElementById(id);
-    if (panel) panel.style.display = 'block';
+    if (panel) {
+        panel.style.display = 'block';
+    } else {
+        console.warn(`Panel bulunamadı: "${id}"`);
+    }
 }
 
 export function closePanels() {
@@ -45,6 +58,12 @@ export function startNewGame() {
 export function loadSavedGame() {
     const saved = SteamBridge.loadGame();
     if (saved) {
+        if (!saved.sceneId || !saved.inventory || !saved.flags) {
+            console.error("Kayıt verisi bozuk, gerekli alanlar eksik.");
+            alert('Kayıt verisi bozuk! Yeni Hikaye başlatılıyor...');
+            startNewGame();
+            return;
+        }
         const mainMenu = document.getElementById('mainMenu');
         if (mainMenu) {
             mainMenu.style.opacity = '0';
@@ -56,7 +75,11 @@ export function loadSavedGame() {
                 const content = document.getElementById('gameContent');
                 if (content) content.style.display = 'block';
                 
-                if (window.GameEngine) window.GameEngine.loadFromState(saved);
+                if (window.GameEngine) {
+                    window.GameEngine.loadFromState(saved);
+                } else {
+                    console.error("GameEngine yüklenemedi, oyun başlatılamıyor.");
+                }
             }, 1000);
         }
     } else {
