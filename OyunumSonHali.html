@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
 <title>Gölgelerin Yetimhanesi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -654,12 +655,31 @@ body.is-night .choice-btn:hover:not(.locked)::before { color: var(--blood-bright
 // --- STEAM & DURUM ENTEGRASYON KÖPRÜSÜ ---
 const SteamBridge = {
     saveGame(stateData) {
-        localStorage.setItem("golgelerin_yetimhanesi_save", JSON.stringify(stateData));
-        console.log("Steam Cloud: Oyun durumu yerel belleğe yedeklendi.");
+        try {
+            localStorage.setItem("golgelerin_yetimhanesi_save", JSON.stringify(stateData));
+        } catch(e) {
+            console.warn("Kayıt hatası:", e.message);
+        }
     },
     loadGame() {
-        const data = localStorage.getItem("golgelerin_yetimhanesi_save");
-        return data ? JSON.parse(data) : null;
+        try {
+            const data = localStorage.getItem("golgelerin_yetimhanesi_save");
+            if (!data) return null;
+            const parsed = JSON.parse(data);
+            return SteamBridge.validateState(parsed) ? parsed : null;
+        } catch(e) {
+            console.warn("Yükleme hatası:", e.message);
+            return null;
+        }
+    },
+    validateState(s) {
+        if (!s || typeof s !== 'object') return false;
+        if (typeof s.sceneId !== 'string') return false;
+        if (!Array.isArray(s.inventory)) return false;
+        if (!s.flags || typeof s.flags !== 'object') return false;
+        const allowedItems = ['mum','çakmak','pusula','yardım fişeği','gizli harita','eski günlük','çocuk dosyaları','ayin odası anahtarı','gizli belgeler'];
+        if (!s.inventory.every(i => allowedItems.includes(i))) return false;
+        return true;
     },
     unlockAchievement(name) {
         console.log(`Steam API: Başarım Açıldı -> [${name}]`);
@@ -768,6 +788,12 @@ const GameEngine = (function(){
   }
 
   function hasItem(item){ return state.inventory.includes(item); }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
 
   function showToast(msg){
     const t = document.getElementById('toast');
@@ -911,7 +937,7 @@ const GameEngine = (function(){
     // Progress Track Oluşturma
     const progTrack = document.getElementById('progressTrack');
     if(progTrack) {
-        progTrack.innerHTML = '';
+        while(progTrack.firstChild) progTrack.removeChild(progTrack.firstChild);
         for(let i=1; i<=5; i++) {
             let seg = document.createElement('div');
             seg.className = 'seg' + (i <= scene.progress ? ' done' : '');
@@ -957,7 +983,11 @@ const GameEngine = (function(){
         html += `</div>`;
     }
 
-    document.getElementById('sceneRoot').innerHTML = html;
+    const sceneRoot = document.getElementById('sceneRoot');
+    while(sceneRoot.firstChild) sceneRoot.removeChild(sceneRoot.firstChild);
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+    while(wrapper.firstChild) sceneRoot.appendChild(wrapper.firstChild);
     renderInventory();
     
     // Otomatik Kaydet
@@ -967,7 +997,7 @@ const GameEngine = (function(){
   function renderInventory() {
     const container = document.getElementById('inventoryItems');
     if(!container) return;
-    container.innerHTML = '';
+    while(container.firstChild) container.removeChild(container.firstChild);
     state.inventory.forEach(item => {
         let chip = document.createElement('div');
         chip.className = 'item-chip' + (state.newItemFlash === item ? ' new' : '');

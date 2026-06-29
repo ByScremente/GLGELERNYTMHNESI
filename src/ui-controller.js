@@ -1,12 +1,31 @@
 // --- STEAM & DURUM ENTEGRASYON KÖPRÜSÜ ---
 export const SteamBridge = {
     saveGame(stateData) {
-        localStorage.setItem("golgelerin_yetimhanesi_save", JSON.stringify(stateData));
-        console.log("💾 Oyun durumu yerel belleğe yedeklendi.");
+        try {
+            localStorage.setItem("golgelerin_yetimhanesi_save", JSON.stringify(stateData));
+        } catch(e) {
+            console.warn("Kayıt hatası:", e.message);
+        }
     },
     loadGame() {
-        const data = localStorage.getItem("golgelerin_yetimhanesi_save");
-        return data ? JSON.parse(data) : null;
+        try {
+            const data = localStorage.getItem("golgelerin_yetimhanesi_save");
+            if (!data) return null;
+            const parsed = JSON.parse(data);
+            return SteamBridge.validateState(parsed) ? parsed : null;
+        } catch(e) {
+            console.warn("Yükleme hatası:", e.message);
+            return null;
+        }
+    },
+    validateState(s) {
+        if (!s || typeof s !== 'object') return false;
+        if (typeof s.sceneId !== 'string') return false;
+        if (!Array.isArray(s.inventory)) return false;
+        if (!s.flags || typeof s.flags !== 'object') return false;
+        const allowedItems = ['mum','çakmak','pusula','yardım fişeği','gizli harita','eski günlük','çocuk dosyaları','ayin odası anahtarı','gizli belgeler'];
+        if (!s.inventory.every(i => allowedItems.includes(i))) return false;
+        return true;
     },
     unlockAchievement(name) {
         console.log(`🏆 Başarım Açıldı -> [${name}]`);
