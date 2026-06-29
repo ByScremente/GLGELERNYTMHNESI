@@ -11,4 +11,12 @@ export default defineConfig({
     minify: 'terser',
   },
   plugins: [],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.js'],
+    },
+  },
 });
