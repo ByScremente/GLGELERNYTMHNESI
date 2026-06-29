@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8a0303">
+    <meta name="description" content="Gölgelerin Yetimhanesi - Atmosferik hikaye oyunu. Gerçek olaylardan esinlenmiştir.">
+    
+    <title>Gölgelerin Yetimhanesi</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=UnifrakturMaguntia&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    
+    <!-- Manifest (PWA) -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+
+<!-- ANA MENÜ UI KATMANI -->
+<div id="mainMenu">
+    <div class="game-background"></div>
+    <div id="lightningFlash"></div>
+    <div class="fog-effect"></div>
+    <span class="inverted-cross">⸸</span>
+    <div class="title-container">
+        <h1 class="game-title-main">Gölgelerin Yetimhanesi</h1>
+    </div>
+    <div class="center-clue-card">
+        <div class="clue-inscription">
+            "Kapının üzerindeki resmi bul.<br>Harita seni gerçeğe götürecek."
+        </div>
+        <div class="clue-symbol">⸸</div>
+    </div>
+    <div class="bottom-menu">
+        <button class="menu-btn" onclick="window.startNewGame()">
+            <div class="icon-box">▶</div>
+            <span>Yeni Oyun</span>
+        </button>
+        <button class="menu-btn" onclick="window.loadSavedGame()">
+            <div class="icon-box">▶</div>
+            <span>Devam Et</span>
+        </button>
+        <button class="menu-btn" onclick="window.openPanel('settingsPanel')">
+            <div class="icon-box">⚙</div>
+            <span>Ayarlar</span>
+        </button>
+        <button class="menu-btn" onclick="window.openPanel('creditsPanel')">
+            <div class="icon-box">🪪</div>
+            <span>Credits</span>
+        </button>
+    </div>
+    <div class="folder-decor">DOSYALAR</div>
+</div>
+
+<!-- AYARLAR & CREDITS PANELLERİ -->
+<div class="ui-panel" id="settingsPanel">
+    <h2 class="panel-title">SES & PARAZİT AYARLARI</h2>
+    <div class="ui-row">
+        <label>Radyo Paraziti & Fısıltılar</label>
+        <input type="range" min="0" max="100" value="75">
+    </div>
+    <div class="ui-row">
+        <label>Fırtına Yoğunluğu</label>
+        <input type="range" min="0" max="100" value="95">
+    </div>
+    <button class="close-btn" onclick="window.closePanels()">KAPAT</button>
+</div>
+
+<div class="ui-panel" id="creditsPanel">
+    <h2 class="panel-title">YETİMHANE PROJE ARŞİVİ</h2>
+    <p style="font-size:13px; color:#ccc; margin: 0 0 10px 0;"><strong>Yazar & Senarist:</strong> Burak Eti</p>
+    <p style="font-size:13px; color:#ccc; margin: 0 0 10px 0;"><strong>Geliştirici:</strong> ByScremente</p>
+    <p style="font-size:13px; color:#ccc; margin: 0 0 20px 0;"><strong>Sürüm:</strong> 1.0.0 (Mobile Optimized)</p>
+    <button class="close-btn" onclick="window.closePanels()">KAPAT</button>
+</div>
+
+<!-- OYUN UI KATMANLARI -->
+<div class="vignette-flicker" id="vignette"></div>
+<div class="screen-crack" id="screenCrack"></div>
+<div class="blackout" id="blackout"></div>
+
+<div class="compass-wrap" id="gameCompassHUD">
+  <div class="compass" id="compass">
+    <div class="needle" id="compassNeedle"></div>
+  </div>
+  <div class="compass-label" id="compassLabel">KUZEY</div>
+</div>
+
+<div id="gameContent">
+  <div class="topbar">
+    <div class="game-title">GÖLGELERİN<br>YETİMHANESİ</div>
+    <div class="daycycle"><span class="dot"></span><span id="dayLabel">GÜNDÜZ</span></div>
+  </div>
+  <div class="progress-track" id="progressTrack"></div>
+  <div id="sceneRoot"></div>
+  <div class="inventory-bar">
+    <div class="inventory-label">ÇANTA H.U.D.</div>
+    <div class="inventory-items" id="inventoryItems"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- JavaScript Modülleri -->
+<script type="module">
+    import { 
+        openPanel, 
+        closePanels, 
+        startNewGame, 
+        loadSavedGame, 
+        initLightningEffect,
+        SteamBridge 
+    } from '/src/game-engine.js';
+
+    // Global'e eriş
+    window.openPanel = openPanel;
+    window.closePanels = closePanels;
+    window.startNewGame = startNewGame;
+    window.loadSavedGame = loadSavedGame;
+    window.SteamBridge = SteamBridge;
+
+    // Menü efektleri
+    initLightningEffect();
+
+    // Service Worker Kaydı (PWA)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js').then(reg => {
+            console.log('✓ Service Worker kaydedildi:', reg);
+        }).catch(err => {
+            console.log('✗ Service Worker hata:', err);
+        });
+    }
+</script>
+
+</body>
+</html>
