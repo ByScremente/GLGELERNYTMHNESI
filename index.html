@@ -7,16 +7,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=UnifrakturMaguntia&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="src/styles.css">
 </head>
 <body>
 
-<!-- ANA MENÜ UI KATMANI -->
+<!-- ANA MENU UI KATMANI -->
 <div id="mainMenu">
     <div class="game-background"></div>
     <div id="lightningFlash"></div>
     <div class="fog-effect"></div>
-    <span class="inverted-cross">⸸</span>
+    <span class="inverted-cross">&#11640;</span>
     <div class="title-container">
         <h1 class="game-title-main">Gölgelerin Yetimhanesi</h1>
     </div>
@@ -24,38 +23,38 @@
         <div class="clue-inscription">
             "Kapının üzerindeki resmi bul.<br>Harita seni gerçeğe götürecek."
         </div>
-        <div class="clue-symbol">⸸</div>
+        <div class="clue-symbol">&#11640;</div>
     </div>
     <div class="bottom-menu">
         <button class="menu-btn" onclick="startNewGame()">
-            <div class="icon-box">▶</div>
+            <div class="icon-box">&#9654;</div>
             <span>Yeni Oyun</span>
         </button>
         <button class="menu-btn" onclick="loadSavedGame()">
-            <div class="icon-box">▶</div>
+            <div class="icon-box">&#9654;</div>
             <span>Devam Et</span>
         </button>
         <button class="menu-btn" onclick="openPanel('settingsPanel')">
-            <div class="icon-box">⚙</div>
+            <div class="icon-box">&#9881;</div>
             <span>Ayarlar</span>
         </button>
         <button class="menu-btn" onclick="openPanel('creditsPanel')">
-            <div class="icon-box">🪪</div>
+            <div class="icon-box">&#129714;</div>
             <span>Credits</span>
         </button>
     </div>
     <div class="folder-decor">DOSYALAR</div>
 </div>
 
-<!-- AYARLAR & CREDITS PANELLERİ -->
+<!-- AYARLAR & CREDITS PANELLERI -->
 <div class="ui-panel" id="settingsPanel">
-    <h2 class="panel-title">SES & PARAZİT AYARLARI</h2>
+    <h2 class="panel-title">SES & PARAZIT AYARLARI</h2>
     <div class="ui-row">
-        <label>Radyo Paraziti & Fısıltılar</label>
+        <label>Radyo Paraziti & Fisiltilar</label>
         <input type="range" min="0" max="100" value="75">
     </div>
     <div class="ui-row">
-        <label>Fırtına Yoğunluğu</label>
+        <label>Firtina Yogunlugu</label>
         <input type="range" min="0" max="100" value="95">
     </div>
     <button class="close-btn" onclick="closePanels()">KAPAT</button>
@@ -95,17 +94,6 @@
 
 <div class="toast" id="toast"></div>
 
-<script type="module">
-import { openPanel, closePanels, startNewGame, loadSavedGame, initLightningEffect } from './src/ui-controller.js';
-import GameEngine from './src/game-engine.js';
-
-window.GameEngine = GameEngine;
-window.openPanel = openPanel;
-window.closePanels = closePanels;
-window.startNewGame = startNewGame;
-window.loadSavedGame = loadSavedGame;
-
-initLightningEffect();
-</script>
+<script type="module" src="/src/index.js"></script>
 </body>
 </html>
