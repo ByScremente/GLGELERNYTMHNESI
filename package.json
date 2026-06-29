@@ -1,0 +1,26 @@
+{
+  "name": "golgelerin-yetimhanesi",
+  "version": "1.0.0",
+  "description": "Atmosferik hikaye oyunu. Gerçek olaylardan esinlenmiştir.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "vite preview --port 5000"
+  },
+  "keywords": [
+    "game",
+    "interactive-fiction",
+    "horror",
+    "story",
+    "turkish"
+  ],
+  "author": "Burak Eti & ByScremente",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@vitejs/plugin-basic-ssl": "^1.1.0"
+  }
+}
