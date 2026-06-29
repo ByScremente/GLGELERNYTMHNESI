@@ -8,7 +8,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "serve": "vite preview --port 5000"
+    "serve": "vite preview --port 5000",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "game",
@@ -20,7 +23,10 @@
   "author": "Burak Eti & ByScremente",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "^1.1.0",
+    "@vitest/coverage-v8": "^4.1.9",
+    "jsdom": "^28.1.0",
     "vite": "^5.0.0",
-    "@vitejs/plugin-basic-ssl": "^1.1.0"
+    "vitest": "^4.1.9"
   }
 }
